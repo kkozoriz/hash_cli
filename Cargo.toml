@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Konstantin Kozoriz <kkozoriz7@yandex.ru>"]
 readme = "README.md"
-description = ""
+description = "Hash Finder is a command-line application developed in Rust that iterates through integers starting from 1, computes their SHA-256 hash, and prints the integer and its corresponding hash if the hash ends with a specified number of zeroes."
 
 [profile.release]
 opt-level = 3
