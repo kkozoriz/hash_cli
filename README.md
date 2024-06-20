@@ -38,7 +38,7 @@ For more options and usage details, you can run:
 ```
 
 ## Tests
-
+Run:
 ```cargo test```
 
 ## Example
