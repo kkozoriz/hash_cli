@@ -98,4 +98,65 @@ pub fn found_hash(zero_count: usize, hash_count: usize) -> Arc<Mutex<Vec<(u64, S
     results
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::{AtomicBool, AtomicU64};
+    use std::sync::{Arc, Mutex};
+    use std::vec::Vec;
 
+    #[test]
+    fn test_sha256() {
+        let result = sha256(828028);
+        assert_eq!(
+            result,
+            "d95f19b5269418c0d4479fa61b8e7696aa8df197082b431a65ff37595c100000"
+        );
+    }
+
+    #[test]
+    fn test_worker_thread() {
+        let counter = Arc::new(AtomicU64::new(0));
+        let results = Arc::new(Mutex::new(Vec::new()));
+        let zero_suffix = Arc::new("0".to_string());
+        let found = Arc::new(AtomicBool::new(false));
+
+        worker_thread(
+            Arc::clone(&counter),
+            Arc::clone(&results),
+            Arc::clone(&zero_suffix),
+            Arc::clone(&found),
+            1,
+        );
+
+        let results = results.lock().unwrap();
+        assert!(results.len() > 0);
+        assert!(results[0].1.ends_with("0"));
+    }
+
+    #[test]
+    fn test_found_hash() {
+        let zero_count = 1;
+        let hash_count = 1;
+
+        let results = found_hash(zero_count, hash_count);
+        let results = results.lock().unwrap();
+
+        assert_eq!(results.len(), hash_count);
+        assert!(results[0].1.ends_with("0"));
+    }
+
+    #[test]
+    fn test_multiple_threads() {
+        let zero_count = 3;
+        let hash_count = 5;
+
+        let results = found_hash(zero_count, hash_count);
+        let results = results.lock().unwrap();
+
+        assert_eq!(results.len(), hash_count);
+        for (_, hash) in results.iter() {
+            assert!(hash.ends_with("000"));
+        }
+    }
+}
